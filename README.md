@@ -29,13 +29,14 @@ Define:
 - The product idea in one short sentence
 
 The product must have these components each fulfilling a useful function:
-- The nanobot agent
+- LLM-powered agent (preferably `nanobot`)
 - Frontend
 - Backend
 - Database
 
-> 🟪 **Note**
-> `Telegram` bots deployed on a university VM can fail to receive messages when hosted there.
+> 🟪 **Notes**
+> 1. You are advised to use the setup from Lab 8 as the base to iterate from.
+> 2. `Telegram` bots deployed on a university VM can fail to receive messages when hosted there.
 
 #### Task 3 (approved by TA during the lab).
 Produce a plan including:
