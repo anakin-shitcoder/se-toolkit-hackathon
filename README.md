@@ -1,170 +1,288 @@
-# Lab 9 - Quiz and Hackathon
+# Feedback Collector
 
-The lab opens with a quiz and then kicks off the hackathon.
+A simple feedback collection system for small businesses (cafés, bakeries, repair shops) to track customer reviews and comments without complex tools.
 
-To get the full point for the lab, you need to:
+![Feedback Form Screenshot](https://via.placeholder.com/600x300/0d6efd/ffffff?text=Feedback+Form+Screenshot)
+![Dashboard Screenshot](https://via.placeholder.com/600x300/198754/ffffff?text=Dashboard+Screenshot)
 
-- Pass Tasks 1, 2, 3 during the lab AND
-- Finish Tasks 4 and 5 by the usual deadline of Thursday 23:59.
+---
 
-Each student builds their own project:
+## Context
 
-- Go from an idea to a deployed product.
-- Use agents and LLMs throughout.
+### End Users
+Small business owners (café owners, bakery managers, repair shop operators) who want to track customer feedback without complex tools.
 
-----
+### Problem
+Customer feedback is scattered across verbal comments, social media DMs, and paper notes, making it hard to spot issues or praise systematically.
 
-## Task 1 (graded by TA after the lab)
+### Solution
+A simple feedback collector where customers submit comments via a web form and the business owner sees them on a clean dashboard with statistics and filtering.
 
-Pen and paper quiz:
+---
 
-- 20 mins;
-- closed book, no devices;
-- you get 3 random questions from the question bank;
-- answer at least 2.
+## Features
 
-## Task 2 (approved by TA during the lab)
+### ✅ Implemented
 
-Ideate and plan your project.
+**Version 1 - Core Feature:**
+- ✅ Customer feedback submission form with star rating (1-5 stars)
+- ✅ Backend API with SQLite database
+- ✅ Owner dashboard displaying all feedback (newest first)
+- ✅ Responsive web interface with Bootstrap
 
-### Project idea
+**Version 2 - Additional Features:**
+- ✅ Bar chart showing rating distribution (📊)
+- ✅ Filter by rating (keeps newest first)
+- ✅ Automatic email notifications for new feedback
+- ✅ Statistics cards (total feedback, average rating, 5-star count)
+- ✅ Docker support for easy deployment
+- ✅ RESTful API with error handling
 
-The project idea must be:
+### 📋 Not Implemented
+- [ ] Multi-language support
+- [ ] Export to CSV/PDF
+- [ ] Admin authentication
+- [ ] Reply to feedback
 
-- something simple to build;
-- clearly useful;
-- easy to explain.
+---
 
-Define and show to your TA:
+## Usage
 
-- End-user of the product
-- What problem your product solves for the end-user?
-- The product idea in one short sentence.
-- What is the product's core feature?
+### For Customers
+1. Open the Feedback Collector in your browser
+2. Fill in the feedback form:
+   - Name (optional)
+   - Email (optional)
+   - Star rating (1-5 stars, required)
+   - Message (required)
+3. Click "Submit Feedback"
 
-### Implementation plan
+### For Business Owners
+1. Click "Dashboard" in the navigation
+2. View statistics:
+   - Total feedback count
+   - Average rating
+   - 5-star reviews count
+3. See rating distribution in the bar chart
+4. Filter feedback by rating using the dropdown
+5. All feedback is sorted by newest first
 
-When the idea is approved, produce a plan for two product versions.
+---
 
-Version 1 does one core thing well:
+## API Endpoints
 
-- Pick the one feature most valuable to the end-user and relatively easy to implement;
-- It is a functioning product, not a prototype;
-- Must be shown to the TA upon completion for feedback.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/feedback` | Submit new feedback |
+| GET | `/api/feedback` | Get all feedback (optional: `?rating=1-5`) |
+| GET | `/api/feedback/:id` | Get specific feedback |
+| DELETE | `/api/feedback/:id` | Delete feedback |
+| GET | `/api/stats` | Get statistics |
 
-Version 2 builds upon Version 1:
+### Example: Submit Feedback
+```bash
+curl -X POST http://localhost:3000/api/feedback \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "message": "Great service!",
+    "rating": 5
+  }'
+```
 
-- Improves the initial feature or adds another one on top;
-- Address TA feedback from the lab;
-- Deploy and make it available for use.
+### Example: Get Feedback with Filter
+```bash
+curl http://localhost:3000/api/feedback?rating=5
+```
 
-The product must have the following components, each fulfilling a useful function:
+---
 
-- backend;
-- database;
-- end-user-facing client: web app, mobile app, or LLM-powered agent, e.g. `nanobot`.
+## Deployment
 
-Note:
+### Prerequisites
+- **OS:** Ubuntu 24.04 (or similar Linux distribution)
+- **Required:** Docker and Docker Compose
 
-- You can use the setup from Lab 8 or start from scratch.
-- `Telegram` bots are blocked on university VMs.
+### Step-by-Step Deployment
 
-## Task 3 (approved by TA during the lab)
+#### Option 1: Docker Compose (Recommended)
 
-Implement Version 1 outlined in the plan:
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repo-url>
+   cd se-toolkit-hackathon
+   ```
 
-- Build one core feature;
-- Follow best practices and git workflow;
-- Test it yourself and fix bugs;
-- Have the TA try it as a user;
-- Take note of the TA feedback;
-- Get TA's approval for the task to be marked as DONE.
+2. **Configure environment (optional):**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your email settings if you want notifications
+   ```
 
-## Task 4
+3. **Start the application:**
+   ```bash
+   docker-compose up -d
+   ```
 
-Implement and deploy Version 2 outlined in the plan:
+4. **Access the application:**
+   Open your browser and navigate to `http://localhost:3000`
 
-- Build and polish functionality;
-- Take TA feedback into account;
-- Push all code to the GitHub repo (see the detailed instructions below);
-- Follow best practices and git workflow;
-- Document your solution;
-- Dockerize all services;
-- Deploy it to be accessible to use.
+5. **View logs:**
+   ```bash
+   docker-compose logs -f
+   ```
 
-Version 2 can be completed during the lab or after it, before the usual deadline.
+6. **Stop the application:**
+   ```bash
+   docker-compose down
+   ```
 
-## Task 5 (demo and PDF submitted through Moodle)
+#### Option 2: Manual Installation
 
-Submit a presentation with five slides:
+1. **Install Node.js (v20+):**
+   ```bash
+   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+   ```
 
-1. Title:
+2. **Clone and install dependencies:**
+   ```bash
+   git clone <your-repo-url>
+   cd se-toolkit-hackathon/backend
+   npm install
+   ```
 
-   - Product title
-   - Your name
-   - Your university email
-   - Your group
+3. **Start the server:**
+   ```bash
+   npm start
+   ```
+   
+   Or for development with auto-reload:
+   ```bash
+   npm run dev
+   ```
 
-2. Context:
+4. **Run tests:**
+   ```bash
+   npm test
+   ```
 
-   - End-user of the product
-   - What problem your product solves
-   - The product idea in one short sentence
+5. **Access the application:**
+   Open `http://localhost:3000` in your browser
 
-3. Implementation:
+### Email Configuration (Optional)
 
-   - How you built the product
-   - What went into Version 1 and Version 2
-   - What TA feedback points you addressed
+To enable email notifications:
 
-4. Demo:
+1. Copy `.env.example` to `.env` in the backend directory
+2. Set `EMAIL_ENABLED=true`
+3. Configure your SMTP settings:
+   - `SMTP_HOST` - SMTP server (e.g., smtp.gmail.com)
+   - `SMTP_PORT` - SMTP port (usually 587 for TLS)
+   - `SMTP_USER` - Your email address
+   - `SMTP_PASS` - Your email app password
+   - `NOTIFICATION_EMAIL` - Where to send notifications
 
-   - Pre-recorded video demonstration of Version 2 with voice-over (no longer than 2 minutes).
-   - _Note:_ **This is the most important part of the presentation**.
+**Note:** For Gmail, you need to use an [App Password](https://support.google.com/accounts/answer/185833), not your regular password.
 
-5. Links:
+---
 
-   - Link and QR code for each of these:
-     - The GitHub repo with the product code
-     - Deployed product (latest version)
+## Architecture
 
-----
+```
+┌─────────────────────────────────────┐
+│         Frontend (Browser)          │
+│  ┌──────────────┐  ┌─────────────┐  │
+│  │ Submit Form  │  │  Dashboard  │  │
+│  └──────────────┘  └─────────────┘  │
+└──────────────┬──────────────────────┘
+               │ HTTP/REST API
+               ▼
+┌──────────────────────────────────────┐
+│      Backend (Node.js + Express)     │
+│  ┌──────────────────────────────┐   │
+│  │   API Routes & Controllers   │   │
+│  └──────────────────────────────┘   │
+│           │            │             │
+│           ▼            ▼             │
+│  ┌────────────┐  ┌──────────────┐   │
+│  │  SQLite    │  │  Email       │   │
+│  │  Database  │  │  Service     │   │
+│  └────────────┘  └──────────────┘   │
+└──────────────────────────────────────┘
+```
 
-## Publishing the product code on GitHub
+### Tech Stack
+- **Backend:** Node.js, Express
+- **Database:** SQLite (via better-sqlite3)
+- **Frontend:** HTML5, CSS3, JavaScript (Bootstrap 5)
+- **Email:** Nodemailer
+- **Containerization:** Docker, Docker Compose
 
-- Publish the product code in a repository on `GitHub`.
+---
 
-  The repository must be called `se-toolkit-hackathon`.
+## Project Structure
 
-- Add the MIT license file to make your product open-source.
+```
+se-toolkit-hackathon/
+├── backend/
+│   ├── src/
+│   │   ├── server.js       # Main server file
+│   │   ├── database.js     # Database initialization and models
+│   │   └── email.js        # Email notification service
+│   ├── tests/
+│   │   └── api.test.js     # API integration tests
+│   ├── Dockerfile
+│   ├── package.json
+│   └── .env.example
+├── frontend/
+│   ├── index.html          # Main HTML with form and dashboard
+│   ├── css/
+│   │   └── style.css       # Custom styles
+│   └── js/
+│       └── app.js          # Frontend JavaScript logic
+├── docker-compose.yml      # Docker orchestration
+├── .env.example            # Environment variables template
+└── README.md               # This file
+```
 
-- Add `README.md` in the product repository.
+---
 
-  `README.md` structure:
+## Testing
 
-  - Product name (as title)
+Run the test suite:
 
-  - One-line description
+```bash
+cd backend
+npm install
+npm test
+```
 
-  - Demo:
-    - A couple of relevant screenshots of the product
+The tests cover:
+- ✅ Submitting valid feedback
+- ✅ Validation of required fields
+- ✅ Rating validation (1-5)
+- ✅ Fetching all feedback
+- ✅ Filtering by rating
+- ✅ Statistics endpoint
+- ✅ Feedback ordering (newest first)
+- ✅ Deleting feedback
+- ✅ Error handling
 
-  - Product context:
+---
 
-    - End users
-    - Problem that your product solves for end users
-    - Your solution
+## License
 
-  - Features:
+MIT License - See LICENSE file for details
 
-    - Implemented and not yet implemented features
+---
 
-  - Usage:
+## Links
 
-    - Explain how to use your product
+- **GitHub Repository:** [se-toolkit-hackathon](https://github.com/<your-username>/se-toolkit-hackathon)
+- **Live Demo:** [Deployed Application](http://your-deployment-url.com)
 
-  - Deployment:
+---
 
-    - Which OS the VM should run on (you may assume `Ubuntu 24.04` like on your university VMs)
-    - What should be installed on the VM
-    - Step-by-step deployment instructions
+**Built with ❤️ for small businesses**

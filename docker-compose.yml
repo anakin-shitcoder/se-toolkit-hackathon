@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  feedback-collector:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: feedback-collector
+    ports:
+      - "3000:3000"
+    volumes:
+      - feedback-data:/app/data
+    environment:
+      - PORT=3000
+      - DB_PATH=/app/data/feedback.db
+      - EMAIL_ENABLED=${EMAIL_ENABLED:-false}
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - NOTIFICATION_EMAIL=${NOTIFICATION_EMAIL:-}
+    restart: unless-stopped
+
+volumes:
+  feedback-data:
