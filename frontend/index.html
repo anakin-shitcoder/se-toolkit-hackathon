@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Collector</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-chat-heart me-2" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M2.965 12.695a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2Zm-.8 3.108.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125ZM8 5.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132Z"/>
+        </svg>
+        Feedback Collector
+      </a>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link active" href="#" data-tab="submit">Submit Feedback</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-tab="dashboard">Dashboard</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <!-- Submit Feedback Tab -->
+    <div id="submit-tab" class="tab-content">
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+          <div class="card shadow">
+            <div class="card-header bg-success text-white">
+              <h4 class="mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle me-2" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14Zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16Z"/>
+                  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4Z"/>
+                </svg>
+                Share Your Feedback
+              </h4>
+            </div>
+            <div class="card-body">
+              <form id="feedback-form">
+                <div class="mb-3">
+                  <label for="name" class="form-label">Your Name (optional)</label>
+                  <input type="text" class="form-control" id="name" placeholder="John Doe">
+                </div>
+                
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email (optional)</label>
+                  <input type="email" class="form-control" id="email" placeholder="john@example.com">
+                </div>
+                
+                <div class="mb-3">
+                  <label class="form-label">Rating *</label>
+                  <div class="star-rating" id="star-rating">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                  </div>
+                  <input type="hidden" id="rating" required>
+                  <div class="form-text">Click to rate (1-5 stars)</div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="message" class="form-label">Your Feedback *</label>
+                  <textarea class="form-control" id="message" rows="4" required 
+                    placeholder="Tell us about your experience..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send me-2" viewBox="0 0 16 16">
+                    <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.812 13.414a.5.5 0 0 1-.906-.11L6.5 9.5 2.086 13.88a.5.5 0 0 1-.77-.528l5.812-13.414a.5.5 0 0 1 .906.11L10.5 4.5l4.414-4.354a.5.5 0 0 1 .94.002Z"/>
+                  </svg>
+                  Submit Feedback
+                </button>
+              </form>
+              
+              <div id="form-message" class="mt-3" style="display: none;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div id="dashboard-tab" class="tab-content" style="display: none;">
+      <!-- Statistics Cards -->
+      <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+          <div class="card stats-card bg-primary text-white shadow">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="card-title">Total Feedback</h6>
+                  <h2 id="total-feedback">0</h2>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" opacity="0.3" viewBox="0 0 16 16">
+                  <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2Zm6.5 4.5v9h-1v-9h1Zm2.5 0v9h-1v-9h1Zm-5 0v9h-1v-9h1Z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <div class="card stats-card bg-success text-white shadow">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="card-title">Average Rating</h6>
+                  <h2 id="avg-rating">0.00</h2>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" opacity="0.3" viewBox="0 0 16 16">
+                  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256Z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <div class="card stats-card bg-info text-white shadow">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="card-title">5-Star Reviews</h6>
+                  <h2 id="five-star-count">0</h2>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" opacity="0.3" viewBox="0 0 16 16">
+                  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256Z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Rating Distribution Chart -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card shadow">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-bar-chart me-2" viewBox="0 0 16 16">
+                  <path d="M4 11H2v3h2v-3Zm5-4H7v7h2V7Zm5-5h-2v12h2V2Zm-2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1h-2ZM6 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Zm-5 4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3Z"/>
+                </svg>
+                Rating Distribution
+              </h5>
+            </div>
+            <div class="card-body">
+              <div id="rating-chart" class="chart-container"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Filter Controls -->
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-md-6">
+                  <h5 class="mb-0">Feedback List</h5>
+                </div>
+                <div class="col-md-6">
+                  <div class="d-flex gap-2 justify-content-md-end">
+                    <label class="form-label mb-0">Filter by rating:</label>
+                    <select id="rating-filter" class="form-select form-select-sm" style="width: auto;">
+                      <option value="">All Ratings</option>
+                      <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                      <option value="4">⭐⭐⭐⭐ (4)</option>
+                      <option value="3">⭐⭐⭐ (3)</option>
+                      <option value="2">⭐⭐ (2)</option>
+                      <option value="1">⭐ (1)</option>
+                    </select>
+                    <button id="refresh-btn" class="btn btn-sm btn-outline-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1ZM8 1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0v-4A.5.5 0 0 1 8 1Zm0 13a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 1 0v4a.5.5 0 0 1-.5.5Z"/>
+                      </svg>
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Feedback List -->
+      <div class="row">
+        <div class="col-12">
+          <div id="feedback-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
