@@ -2,6 +2,8 @@
 
 A simple feedback collection system for small businesses (cafés, bakeries, repair shops) to track customer reviews and comments without complex tools.
 
+**Mark Mugerman** — CSE-01, Innopolis University
+
 ![Feedback Form Screenshot](https://via.placeholder.com/600x300/0d6efd/ffffff?text=Feedback+Form+Screenshot)
 ![Dashboard Screenshot](https://via.placeholder.com/600x300/198754/ffffff?text=Dashboard+Screenshot)
 
