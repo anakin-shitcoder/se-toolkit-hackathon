@@ -1,185 +1,98 @@
-const initSqlJs = require('sql.js');
 const fs = require('fs');
 const path = require('path');
 
-let dbInstance = null;
-let SQL = null;
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../data/feedback.json');
 
-async function initDatabase() {
-  if (dbInstance) return dbInstance;
-  
-  if (!SQL) {
-    SQL = await initSqlJs();
+function ensureDataDir() {
+  const dir = path.dirname(DB_PATH);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
-  
-  const dbPath = process.env.DB_PATH || path.join(__dirname, '../data/feedback.db');
-  
-  // Ensure data directory exists
-  const dataDir = path.dirname(dbPath);
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-  
-  // Load existing database or create new
-  try {
-    if (fs.existsSync(dbPath)) {
-      const fileBuffer = fs.readFileSync(dbPath);
-      dbInstance = new SQL.Database(fileBuffer);
-    } else {
-      dbInstance = new SQL.Database();
-    }
-  } catch (err) {
-    dbInstance = new SQL.Database();
-  }
-  
-  // Create feedback table
-  dbInstance.run(`
-    CREATE TABLE IF NOT EXISTS feedback (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL DEFAULT 'Anonymous',
-      email TEXT,
-      message TEXT NOT NULL,
-      rating INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  
-  // Create indexes
-  dbInstance.run(`
-    CREATE INDEX IF NOT EXISTS idx_feedback_rating ON feedback(rating)
-  `);
-  dbInstance.run(`
-    CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at DESC)
-  `);
-  
-  // Save database to disk
-  saveDatabase(dbPath);
-  
-  return dbInstance;
 }
 
-function saveDatabase(dbPath) {
-  const data = dbInstance.export();
-  const buffer = Buffer.from(data);
-  fs.writeFileSync(dbPath, buffer);
+function loadDB() {
+  ensureDataDir();
+  try {
+    const data = fs.readFileSync(DB_PATH, 'utf8');
+    return JSON.parse(data);
+  } catch (err) {
+    return { feedback: [], nextId: 1 };
+  }
+}
+
+function saveDB(db) {
+  ensureDataDir();
+  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
 }
 
 class FeedbackModel {
-  constructor(db) {
-    this.db = db;
-  }
-  
   create({ name, email, message, rating }) {
-    this.db.run(
-      'INSERT INTO feedback (name, email, message, rating) VALUES (?, ?, ?, ?)',
-      [name, email, message, rating]
-    );
-    
-    // Get the last inserted ID
-    const result = this.db.exec('SELECT last_insert_rowid() as id');
-    const id = result[0].values[0][0];
-    
-    return this.findById(id);
-  }
-  
-  findById(id) {
-    const result = this.db.exec(
-      'SELECT * FROM feedback WHERE id = ' + id
-    );
-    
-    if (result.length === 0 || result[0].values.length === 0) {
-      return null;
-    }
-    
-    const columns = result[0].columns;
-    const values = result[0].values[0];
-    
-    const feedback = {};
-    columns.forEach((col, idx) => {
-      feedback[col] = values[idx];
-    });
-    
+    const db = loadDB();
+    const feedback = {
+      id: db.nextId++,
+      name: name || 'Anonymous',
+      email: email || null,
+      message,
+      rating,
+      created_at: new Date().toISOString().replace('T', ' ').substring(0, 19)
+    };
+    db.feedback.push(feedback);
+    saveDB(db);
     return feedback;
   }
-  
+
+  findById(id) {
+    const db = loadDB();
+    return db.feedback.find(f => f.id === parseInt(id)) || null;
+  }
+
   findAll({ rating, limit = 100, offset = 0 } = {}) {
-    let query = 'SELECT * FROM feedback';
-    const conditions = [];
-    
+    const db = loadDB();
+    let items = [...db.feedback];
+
     if (rating) {
-      conditions.push('rating = ' + rating);
+      items = items.filter(f => f.rating === parseInt(rating));
     }
-    
-    if (conditions.length > 0) {
-      query += ' WHERE ' + conditions.join(' AND ');
-    }
-    
-    query += ` ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
-    
-    const result = this.db.exec(query);
-    
-    if (result.length === 0) {
-      return [];
-    }
-    
-    const columns = result[0].columns;
-    return result[0].values.map(values => {
-      const feedback = {};
-      columns.forEach((col, idx) => {
-        feedback[col] = values[idx];
-      });
-      return feedback;
-    });
+
+    // Sort newest first
+    items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    return items.slice(offset, offset + limit);
   }
-  
+
   getStats() {
-    // Total count
-    const totalResult = this.db.exec('SELECT COUNT(*) as total FROM feedback');
-    const total = totalResult[0]?.values[0][0] || 0;
-    
-    // Average rating
-    const avgResult = this.db.exec('SELECT AVG(rating) as avg_rating FROM feedback');
-    const avgRating = avgResult[0]?.values[0][0] || 0;
-    
-    // Rating distribution
-    const distResult = this.db.exec(`
-      SELECT rating, COUNT(*) as count
-      FROM feedback
-      GROUP BY rating
-      ORDER BY rating
-    `);
-    
-    const byRating = [];
-    if (distResult.length > 0) {
-      distResult[0].values.forEach(row => {
-        byRating.push({
-          rating: row[0],
-          count: row[1]
-        });
-      });
-    }
-    
-    // Ensure all ratings 1-5 are represented
-    const ratingDistribution = [1, 2, 3, 4, 5].map(rating => {
-      const found = byRating.find(item => item.rating === rating);
-      return {
-        rating,
-        count: found ? found.count : 0
-      };
-    });
-    
-    return {
-      total,
-      averageRating: avgRating ? parseFloat(avgRating).toFixed(2) : 0,
-      ratingDistribution
-    };
+    const db = loadDB();
+    const items = db.feedback;
+    const total = items.length;
+    const avgRating = total > 0
+      ? (items.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(2)
+      : '0.00';
+
+    const ratingDistribution = [1, 2, 3, 4, 5].map(r => ({
+      rating: r,
+      count: items.filter(f => f.rating === r).length
+    }));
+
+    return { total, averageRating: avgRating, ratingDistribution };
   }
-  
+
   delete(id) {
-    this.db.run('DELETE FROM feedback WHERE id = ' + id);
-    const result = this.db.exec('SELECT changes()');
-    return result[0]?.values[0][0] > 0;
+    const db = loadDB();
+    const idx = db.feedback.findIndex(f => f.id === parseInt(id));
+    if (idx === -1) return false;
+    db.feedback.splice(idx, 1);
+    saveDB(db);
+    return true;
   }
 }
 
-module.exports = { initDatabase, FeedbackModel, saveDatabase };
+// Synchronous init
+function initDatabase() {
+  ensureDataDir();
+  if (!fs.existsSync(DB_PATH)) {
+    saveDB({ feedback: [], nextId: 1 });
+  }
+  return new FeedbackModel();
+}
+
+module.exports = { initDatabase, FeedbackModel, saveDatabase: () => {} };
